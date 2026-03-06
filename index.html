@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summer Vacation Planner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>&#9788; Summer Vacation Planner</h1>
+      <div class="trip-meta">
+        <input type="text" id="tripName" placeholder="Trip name (e.g. Europe 2026)" />
+        <input type="date" id="startDate" />
+        <span>to</span>
+        <input type="date" id="endDate" />
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="itinerary">Itinerary</button>
+      <button class="tab" data-tab="budget">Budget</button>
+      <button class="tab" data-tab="compare">Compare Trips</button>
+    </div>
+
+    <!-- Itinerary Tab -->
+    <section id="itinerary" class="tab-content active">
+      <div class="section-header">
+        <h2>Day-by-Day Itinerary</h2>
+        <button id="addDayBtn" class="btn-primary">+ Add Day</button>
+      </div>
+      <div id="daysContainer"></div>
+    </section>
+
+    <!-- Budget Tab -->
+    <section id="budget" class="tab-content">
+      <div class="section-header">
+        <h2>Budget Tracker</h2>
+        <div class="budget-total-bar">
+          <label>Total Budget: $<input type="number" id="totalBudget" placeholder="0" min="0" /></label>
+          <div class="budget-summary">
+            <span>Spent: <strong id="totalSpent">$0</strong></span>
+            <span>Remaining: <strong id="remaining">$0</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="budget-progress-wrap">
+        <div class="budget-progress-bar"><div id="budgetProgress"></div></div>
+        <span id="budgetPercent">0%</span>
+      </div>
+
+      <div class="section-header" style="margin-top:1.5rem">
+        <h3>Expenses</h3>
+        <button id="addExpenseBtn" class="btn-primary">+ Add Expense</button>
+      </div>
+
+      <div class="expense-filters">
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+          <option>Transport</option>
+          <option>Accommodation</option>
+          <option>Food</option>
+          <option>Activities</option>
+          <option>Shopping</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <table id="expenseTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="expenseList"></tbody>
+      </table>
+
+      <div class="category-breakdown">
+        <h3>Breakdown by Category</h3>
+        <div id="categoryChart"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Day Modal -->
+  <div id="dayModal" class="modal hidden">
+    <div class="modal-box">
+      <h3 id="dayModalTitle">Add Day</h3>
+      <label>Date<input type="date" id="dayDate" /></label>
+      <label>Location / Destination<input type="text" id="dayLocation" placeholder="e.g. Paris, France" /></label>
+      <label>Activities<textarea id="dayActivities" rows="4" placeholder="List activities for this day..."></textarea></label>
+      <label>Notes<textarea id="dayNotes" rows="2" placeholder="Any extra notes..."></textarea></label>
+      <div class="modal-actions">
+        <button id="saveDayBtn" class="btn-primary">Save</button>
+        <button id="cancelDayBtn" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense Modal -->
+  <div id="expenseModal" class="modal hidden">
+    <div class="modal-box">
+      <h3 id="expenseModalTitle">Add Expense</h3>
+      <label>Date<input type="date" id="expDate" /></label>
+      <label>Description<input type="text" id="expDesc" placeholder="e.g. Hotel night 1" /></label>
+      <label>Category
+        <select id="expCategory">
+          <option>Transport</option>
+          <option>Accommodation</option>
+          <option>Food</option>
+          <option>Activities</option>
+          <option>Shopping</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Amount ($)<input type="number" id="expAmount" placeholder="0.00" min="0" step="0.01" /></label>
+      <div class="modal-actions">
+        <button id="saveExpenseBtn" class="btn-primary">Save</button>
+        <button id="cancelExpenseBtn" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare Tab -->
+  <section id="compare" class="tab-content" style="display:none">
+    <div class="section-header">
+      <h2>Florida vs Hawaii</h2>
+      <span class="compare-hint">Enter estimated costs for each option</span>
+    </div>
+
+    <div class="compare-grid">
+      <!-- Florida -->
+      <div class="compare-col" id="col-florida">
+        <div class="compare-col-header florida-header">
+          <span class="compare-flag">&#127796;</span>
+          <input class="compare-name-input" id="cmp-name-florida" value="Florida" />
+        </div>
+        <div id="compare-rows-florida" class="compare-rows"></div>
+        <button class="compare-add-btn" onclick="addCompareRow('florida')">+ Add Item</button>
+        <div class="compare-total-row">
+          <span>Total</span>
+          <span id="cmp-total-florida" class="compare-total-amt">$0</span>
+        </div>
+      </div>
+
+      <!-- Hawaii -->
+      <div class="compare-col" id="col-hawaii">
+        <div class="compare-col-header hawaii-header">
+          <span class="compare-flag">&#127796;</span>
+          <input class="compare-name-input" id="cmp-name-hawaii" value="Hawaii" />
+        </div>
+        <div id="compare-rows-hawaii" class="compare-rows"></div>
+        <button class="compare-add-btn" onclick="addCompareRow('hawaii')">+ Add Item</button>
+        <div class="compare-total-row">
+          <span>Total</span>
+          <span id="cmp-total-hawaii" class="compare-total-amt">$0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Winner banner -->
+    <div id="compare-verdict" class="compare-verdict hidden"></div>
+
+    <!-- Side-by-side bar chart -->
+    <div class="compare-chart-section">
+      <h3>Cost Breakdown</h3>
+      <div id="compare-chart"></div>
+    </div>
+
+    <!-- Itinerary notes -->
+    <div class="compare-notes-grid">
+      <div class="compare-notes-col">
+        <h3>Florida — Trip Notes</h3>
+        <textarea id="notes-florida" placeholder="Activities, must-dos, pros/cons..." rows="5"></textarea>
+      </div>
+      <div class="compare-notes-col">
+        <h3>Hawaii — Trip Notes</h3>
+        <textarea id="notes-hawaii" placeholder="Activities, must-dos, pros/cons..." rows="5"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <div id="overlay" class="overlay hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>
